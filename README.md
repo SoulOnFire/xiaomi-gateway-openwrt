@@ -1,207 +1,207 @@
-# Установка альтернативной прошивки OpenWrt на шлюзы DGNWG05LM и ZHWG11LM
+# Installing alternative OpenWrt firmware on DGNWG05LM and ZHWG11LM gateways
 
-Инструкция относится только к европейской версии шлюза от xiaomi mieu01, 
-с европейской вилкой, а также к версии шлюза от Aqara ZHWG11LM с китайской или 
-европейской вилкой. Для версии xiaomi gateway2 с китайской вилкой 
-DGNWG02LM она не подойдёт, в нём установлены другие аппаратные комплектующие.
+The instruction applies only to the European version of the gateway from xiaomi mieu01,
+with a European plug, as well as a version of the gateway from Aqara ZHWG11LM with a Chinese or
+European plug. For xiaomi gateway2 version with Chinese plug
+DGNWG02LM it will not work, it has other hardware components installed.
 
-Данная инструкция подразумевает, что у вас уже есть доступ ssh к шлюзу.
-Если вы это не сделали, воспользуйтесь инструкцией
+This instruction assumes that you already have ssh access to the gateway.
+If you have not done this, use the instructions
 
-[https://4pda.ru/forum/index.php?act=findpost&pid=99314437&anchor=Spoil-99314437-1](https://4pda.ru/forum/index.php?act=findpost&pid=99314437&anchor=Spoil-99314437-1)
+[https://w3bsit3-dns.com/forum/index.php?act=findpost&pid=99314437&anchor=Spoil-99314437-1>(https://w3bsit3-dns.com/forum/index.php?act=findpost&pid=99314437&anchor=Spoil- 99314437-1)
 
-## Резервная копия
-Сделайте резервную копию. Если вы решите вернуться на
-оригинальную прошивку, для восстановления вам потребуется tar.gz с архивом 
-корневой файловой системы.
+## Backup copy
+Make a backup. If you decide to return to
+original firmware, to restore you need tar.gz with archive
+root filesystem.
 
-```shell script
-tar -cvpzf /tmp/lumi_stock.tar.gz -C / --exclude='./tmp/*' --exclude='./proc/*' --exclude='./sys/*' .
-```
+shell script
+tar -cvpzf /tmp/lumi_stock.tar.gz -C / --exclude = '. / tmp / *' --exclude = '. / proc / *' --exclude = '. / sys / *'.
+``
 
-После того, как бэкап сделается, скачайте его на локальный компьютер
+After the backup is done, download it to your local computer
 
-```shell script
-scp root@*GATEWAY_IP*:/tmp/lumi_stock.tar.gz .
-```
+shell script
+scp root @ * GATEWAY_IP *: / tmp / lumi_stock.tar.gz.
+``
 
-или с помощью программы WinScp в режиме `scp`
+or using WinScp in `scp` mode
 
-Если у вас уже есть образ rootfs сделанный через dd, **всё равно сделайте архив**.
-На этапе загрузки образа dd обычно возникают ошибки nand flash или ubifs. Вариант
-с tar.gz лишён этих недостатков, потому что форматирует флеш перед загрузкой.
+If you already have a rootfs image made with dd, ** make an archive anyway **.
+During the boot phase of the dd image, nand flash or ubifs errors usually occur. Option
+with tar.gz does not have these drawbacks because it formats the flash before loading.
 
-## Припаяйте usb + uart
+## Solder usb + uart
 
-Чтобы провести модификацию прошивки вам потребуется произвести
- аппаратные модификации, припаять 7 проводов к самому шлюзу
-- 3 провода на usb2uart переходник (вы это делали на этапе получения рута)
-- 4 провода на usb разъём или провод с usb штекером на конце.
- Достаточно припаять 4 провода, +5v, d+, d- и gnd.
- ID провод не задействуется
- Проверьте, что d+ и d- не перепутаны местами, иначе устройство не определится
+To modify the firmware you need to make
+ hardware modifications, solder 7 wires to the gateway itself
+- 3 wires for the usb2uart adapter (you did this at the stage of receiving the root)
+- 4 wires per usb connector or a wire with a usb plug at the end.
+ It is enough to solder 4 wires, + 5v, d +, d- and gnd.
+ ID wire is not used
+ Check that d + and d- are not reversed, otherwise the device will not be detected
 
-![Распиновка UART и USB на шлюзе](images/gateway_pinout.jpg "Как припаивать провода")
+! [Pinout of UART and USB on the gateway] (images / gateway_pinout.jpg "How to solder wires")
 
 
-## Прошивка
+## Firmware
 
-Мы подготовили архив с программой mfgtools для загрузки прощивки на шлюз,
-а также саму прошивку. В архив включена программа для windows 
-и консольное приложение под linux
+We have prepared an archive with the mfgtools program for downloading the firmware to the gateway,
+as well as the firmware itself. The archive includes a program for windows
+and a console application for linux
 
-[Версия 0.1.0rc4](files/mfgtools-rc4.zip)
+[Version 0.1.0rc4] (files / mfgtools-rc4.zip)
 
-### Распаковка прошивки
+### Unpacking the firmware
 
-Чтобы после прошивки шлюз сразу подключился к вашей wifi сети, 
-отредактируйте файл
-`Profiles/Linux/OS Firmware/files/wireless`
-и впишите имя и пароль от своей wifi сети в последней секции.
+So that after the firmware the gateway immediately connects to your wifi network,
+edit the file
+`Profiles / Linux / OS Firmware / files / wireless`
+and enter your wifi network name and password in the last section.
 
     config wifi-iface 'wifinet1'
         option ssid 'YOUR_SSID'
         option key 'YOUR_PASSWORD'
 
-Оставьте остальные параметры как есть.
+Leave the rest of the parameters as they are.
 
-### Подключите шлюз к компьютеру
+### Connect the gateway to your computer
 
-Нужно подключить шлюз двумя кабелями к компьютеру. UART и USB.
-USB на данном этапе не будет определяться в компьютере.
-Чтобы подключиться к консоли шлюза, для windows используйте 
-программу PuTTY и используйте COM-порт, который появился для usb2uart.
-Для linux используйте любую терминальную программу, например
-`picocom /dev/ttyUSB0 -b 115200` 
+You need to connect the gateway with two cables to your computer. UART and USB.
+USB at this stage will not be detected in the computer.
+To connect to the gateway console, for windows use
+the PuTTY program and use the COM port that appeared for usb2uart.
+For linux use any terminal program like
+`picocom / dev / ttyUSB0 -b 115200`
 
 
-### Перевод в режим загрузки через USB
+### Switch to USB download mode
 
-Для того чтобы перевести в режим прошивки, нужно при старте шлюза в 
-консоли на последовательном порту прервать загрузку uboot нажатием 
-любой кнопки. У вас будет 1 секунда на это. Появится приглашение для команд
+In order to switch to the firmware mode, you need to start the gateway in
+console on the serial port abort uboot by pressing
+any button. You will have 1 second for this. A prompt for teams will appear
 
     =>
 
-Далее в командной строке uboot вам надо ввести 
+Next, on the uboot command line, you need to enter
 
     bmode usb
 
-И нажать enter. 
-После этого шлюз перейдёт в режим загрузки по usb и mfgtools сможет обновить
-разделы в памяти шлюза.
+And press enter.
+After that, the gateway will switch to usb boot mode and mfgtools will be able to update
+sections in the memory of the gateway.
 
-![Переход в режим загрузки по USB](images/bmode_usb.png "Переход в режим загрузки по USB")
+! [Switch to USB Boot Mode] (images / bmode_usb.png "Switch to USB Boot Mode")
 
-В случае если у вас Windows, вам может потребоваться установить драйвера, 
-из папки Drivers.
+If you have Windows, you may need to install drivers,
+from the Drivers folder.
 
-Запускайте mfgtools.
+Run mfgtools.
 
-#### Windows 
-В случае windows, у вас откроется окно. Если всё припаяно правильно и драйвера
-установлены верно, то в строке в программе будет написано 
+#### Windows
+In case of windows, a window will open. If everything is soldered correctly and the driver
+are set correctly, then the line in the program will say
 HID-compliant device
-![Mfgtools](images/mfgtools_win.png "Mfgtools")
+! [Mfgtools] (images / mfgtools_win.png "Mfgtools")
 
-Нужно нажать кнопку Start для начала прошивки. 
+You need to press the Start button to start the firmware.
 
-После окончания прошивки, когда полоска прогресса дойдёт до конца и 
-станет зелёной, нужно нажать Stop. Если этого не сделать, спустя несколько 
-минут программа начнёт прошивку повторно, и это приведёт к ошибке. Если такое
-случилось, перезагрузите шлюз и повторите процедуру, начиная перевода
-шлюза в `bmode usb`.
+After the end of the firmware, when the progress bar reaches the end and
+turns green, you need to press Stop. If this is not done, after a few
+minutes, the program will restart the firmware, and this will lead to an error. If such
+happened, restart the gateway and repeat the procedure starting the transfer
+gateway to `bmode usb`.
 
 #### Linux
 
-Перейдите в папку с прошивкой. Запустите консольную утилиту от суперпользователя
+Go to the firmware folder. Run the console utility as superuser
 
-```shell script
+shell script
 sudo ./mfgtoolcli -p 1
-```
+``
 
-В псевдографическом интерфейсе будут отображаться этапы прошивки
+The pseudo-graphic interface will display the stages of the firmware
 
-![Mfgtools](images/mfgtools_lin.png)
+! [Mfgtools] (images / mfgtools_lin.png)
 
-При подключении шлюза и обнаружении hid устройства, программа сразу начнёт 
-процесс прошивки. Если процесс не пошёл, проверьте, что устройство подключено и 
-определилось в выводе команды `dmesg`
+When the gateway is connected and the hid device is detected, the program will immediately start
+firmware process. If the process does not go through, check that the device is connected and
+detected in the output of the `dmesg` command
 
 
-### Процесс прошивки
-Следить за этапами прошивки можно также и в консоли вывода самого шлюза.
-По окончанию прошивки в консоли будет выведено 
+### Flashing process
+You can also follow the firmware stages in the output console of the gateway itself.
+At the end of the firmware, the console will display
 
     Update Complete!
 
-![Update complete](images/update_complete.png)
+! [Update complete] (images / update_complete.png)
 
-После этого можно перезагружать шлюз. Вытащите его из розетки и воткните обратно.
-
-
-
-### Использование OpenWrt
-
-Система настроена таким образом, чтобы сразу подключаться к вашей wifi сети, 
-в случае если вы отредактировали файл wireless перед прошивкой.
-Если вы ошиблись, отредактируйте параметры в файле `/etc/config/wireless`
-уже на устройстве.
-
-После прошивки меняется mac адрес шлюза, потому ip адрес тоже скорее всего
-поменяется. Проверьте его в роутере или в самом шлюзе.
-
-# Не забудьте подключить антенны!
-
-Иначе проблемы с подключением к сети обеспечены
-
-На шлюзе предустановлены: 
-- Графический интерфейс OpenWrt LuCi на 80 порту http
-- Domoticz на 8080 порту
-  - Плагин для работы Domoticz с прошивкой Zigbee [Zigate](https://github.com/pipiche38/Domoticz-Zigate)
-  - Веб интерфейс по работе с Zigate для domoticz будет доступен по порту 9440
-- командная утилита для прошивки zigbee модуля jn5169
-
-Не включайте на шлюзе одновременно режимы WiFi AP + Station.
-Драйвер, который используется в системе не может работать в двух режимах 
-одновременно.
-Если вы поменяли настройки LuCi и после этого шлюз перестал подключаться к сети,
-отредактируйте файл `/etc/config/wireless` в соответстиви с тем, что лежит 
-в архиве.
-
-### Работа с Zigbee
-
-1. [Настройка плагина zigate](./zigate.md)
-2. [Установка Zesp32](./zesp32.md)  
-
-### Возврат на стоковую прошивку
-
-Модификация с openwrt затрагивает только изменение корневой файловой системы; 
-загрузчик, ядро и dtb остаётся оригинальными. Потому для возврата на сток нужно
-прошить оригинальную файловую систему из резервной копии.
-
-Положите файл `lumi_stock.tar.gz` в папку `Profiles/Linux/OS Firmware/files`
-рядом с файлом прошивки openwrt и wireless
-Отредактируйте файл `Profiles/Linux/OS Firmware/ucl2.xml`
-текстовым редактором, и замените 
-
-```xml
-<CMD state="Updater" type="push" body="pipe tar -zxv -C /mnt/mtd3" file="files/rc4-domoticz-openwrt-imx6-rootfs.tar.gz" ifdev="MX6UL MX7D MX6ULL">Sending and writing rootfs</CMD>
-```
-
-на строку с путём к файлу архива с оригинальной прошивкой
-
-```xml
-<CMD state="Updater" type="push" body="pipe tar -zxv -C /mnt/mtd3" file="files/lumi_stock.tar.gz" ifdev="MX6UL MX7D MX6ULL">Sending and writing rootfs</CMD>
-```
-
-Дальше опять переведите шлюз в режим загрузки по usb и через mfgtools
-прошейте оригинальную прошивку. 
+After that, you can reboot the gateway. Unplug it and plug it back in.
 
 
-## Ссылки
 
-1. Статья, которая подробно описывает изменения технические модификации: 
-[Xiaomi Gateway (eu version — Lumi.gateway.mieu01 ) Hacked](https://habr.com/ru/post/494296/)
-2. Сборник информации по аппаратному и програмному модингу Xiaomi Gateway [https://github.com/T-REX-XP/XiaomiGatewayHack](https://github.com/T-REX-XP/XiaomiGatewayHack)
-2. Телеграм канал с обсуждением модификаций [https://t.me/xiaomi_gw_hack](https://t.me/xiaomi_gw_hack)
+### Using OpenWrt
+
+The system is configured to immediately connect to your wifi network,
+in case you edited the wireless file before flashing.
+If you make a mistake, edit the parameters in the file `/ etc / config / wireless`
+already on the device.
+
+After the firmware, the mac address of the gateway changes, because the ip address is also most likely
+will change. Check it in the router or in the gateway itself.
+
+# Don't forget to connect the antennas!
+
+Otherwise, problems with connecting to the network are provided
+
+The gateway is pre-installed:
+- OpenWrt LuCi GUI on port 80 http
+- Domoticz at 8080 port
+  - Plugin for Domoticz to work with firmware Zigbee [Zigate] (https://github.com/pipiche38/Domoticz-Zigate)
+  - The web interface for working with Zigate for domoticz will be available on port 9440
+- command utility for flashing zigbee module jn5169
+
+Do not enable WiFi AP + Station modes on the gateway at the same time.
+The driver that is used in the system cannot work in two modes
+at the same time.
+If you changed the LuCi settings and after that the gateway stopped connecting to the network,
+edit the file `/ etc / config / wireless` to match what is
+in the archive.
+
+### Working with Zigbee
+
+1. [Configuring zigate plugin] (./ zigate.md)
+2. [Install Zesp32] (./ zesp32.md)
+
+### Return to stock firmware
+
+Modification with openwrt only affects the modification of the root filesystem;
+bootloader, kernel and dtb remain original. Therefore, to return to stock you need
+flash the original file system from the backup.
+
+Put the file `lumi_stock.tar.gz` in the folder` Profiles / Linux / OS Firmware / files`
+next to the openwrt and wireless firmware file
+Edit the file `Profiles / Linux / OS Firmware / ucl2.xml`
+with a text editor, and replace
+
+`` `xml
+<CMD state = "Updater" type = "push" body = "pipe tar -zxv -C / mnt / mtd3" file = "files / rc4-domoticz-openwrt-imx6-rootfs.tar.gz" ifdev = "MX6UL MX7D MX6ULL "> Sending and writing rootfs </CMD>
+``
+
+to the line with the path to the archive file with the original firmware
+
+`` `xml
+<CMD state = "Updater" type = "push" body = "pipe tar -zxv -C / mnt / mtd3" file = "files / lumi_stock.tar.gz" ifdev = "MX6UL MX7D MX6ULL"> Sending and writing rootfs < / Cmd>
+``
+
+Then again put the gateway into the boot mode via usb and via mfgtools
+flash the original firmware.
+
+
+## Links
+
+1. An article that details the changes and technical modifications:
+[Xiaomi Gateway (eu version - Lumi.gateway.mieu01) Hacked] (https://habr.com/ru/post/494296/)
+2. Collection of information on hardware and software moding Xiaomi Gateway [https://github.com/T-REX-XP/XiaomiGatewayHack ](https://github.com/T-REX-XP/XiaomiGatewayHack)
+2. Telegram channel with discussion of modifications [https://t.me/xiaomi_gw_hack ](https://t.me/xiaomi_gw_hack)
