@@ -8,22 +8,23 @@ DGNWG02LM it will not work, it has other hardware components installed.
 This instruction assumes that you already have ssh access to the gateway.
 If you have not done this, use the instructions
 
-[https://w3bsit3-dns.com/forum/index.php?act=findpost&pid=99314437&anchor=Spoil-99314437-1>(https://w3bsit3-dns.com/forum/index.php?act=findpost&pid=99314437&anchor=Spoil- 99314437-1)
+[https://4pda.ru/forum/index.php?act=findpost&pid=99314437&anchor=Spoil-99314437-1](https://4pda.ru/forum/index.php?act=findpost&pid=99314437&anchor=Spoil-99314437-1)
+
 
 ## Backup copy
 Make a backup. If you decide to return to
 original firmware, to restore you need tar.gz with archive
 root filesystem.
 
-shell script
+```shell script
 tar -cvpzf /tmp/lumi_stock.tar.gz -C / --exclude = '. / tmp / *' --exclude = '. / proc / *' --exclude = '. / sys / *'.
-``
+```
 
 After the backup is done, download it to your local computer
 
-shell script
+```shell script
 scp root @ * GATEWAY_IP *: / tmp / lumi_stock.tar.gz.
-``
+```
 
 or using WinScp in `scp` mode
 
@@ -41,7 +42,7 @@ To modify the firmware you need to make
  ID wire is not used
  Check that d + and d- are not reversed, otherwise the device will not be detected
 
-! [Pinout of UART and USB on the gateway] (images / gateway_pinout.jpg "How to solder wires")
+![Pinout of UART and USB on the gateway](images/gateway_pinout.jpg "How to sold wires")
 
 
 ## Firmware
@@ -50,7 +51,7 @@ We have prepared an archive with the mfgtools program for downloading the firmwa
 as well as the firmware itself. The archive includes a program for windows
 and a console application for linux
 
-[Version 0.1.0rc4] (files / mfgtools-rc4.zip)
+[version 0.1.0rc4](files/mfgtools-rc4.zip)
 
 ### Unpacking the firmware
 
@@ -91,7 +92,7 @@ And press enter.
 After that, the gateway will switch to usb boot mode and mfgtools will be able to update
 sections in the memory of the gateway.
 
-! [Switch to USB Boot Mode] (images / bmode_usb.png "Switch to USB Boot Mode")
+![Switch to USB Boot Mode](images/bmode_usb.png "Switch to USB Boot Mode")
 
 If you have Windows, you may need to install drivers,
 from the Drivers folder.
@@ -102,7 +103,8 @@ Run mfgtools.
 In case of windows, a window will open. If everything is soldered correctly and the driver
 are set correctly, then the line in the program will say
 HID-compliant device
-! [Mfgtools] (images / mfgtools_win.png "Mfgtools")
+![Mfgtools](images/mfgtools_win.png "Mfgtools")
+
 
 You need to press the Start button to start the firmware.
 
@@ -116,13 +118,13 @@ gateway to `bmode usb`.
 
 Go to the firmware folder. Run the console utility as superuser
 
-shell script
+```shell script
 sudo ./mfgtoolcli -p 1
-``
+```
 
 The pseudo-graphic interface will display the stages of the firmware
 
-! [Mfgtools] (images / mfgtools_lin.png)
+![Mfgtools](images/mfgtools_lin.png)
 
 When the gateway is connected and the hid device is detected, the program will immediately start
 firmware process. If the process does not go through, check that the device is connected and
@@ -135,7 +137,7 @@ At the end of the firmware, the console will display
 
     Update Complete!
 
-! [Update complete] (images / update_complete.png)
+![Update complete](images/update_complete.png)
 
 After that, you can reboot the gateway. Unplug it and plug it back in.
 
@@ -185,15 +187,15 @@ next to the openwrt and wireless firmware file
 Edit the file `Profiles / Linux / OS Firmware / ucl2.xml`
 with a text editor, and replace
 
-`` `xml
+```xml
 <CMD state = "Updater" type = "push" body = "pipe tar -zxv -C / mnt / mtd3" file = "files / rc4-domoticz-openwrt-imx6-rootfs.tar.gz" ifdev = "MX6UL MX7D MX6ULL "> Sending and writing rootfs </CMD>
-``
+```
 
 to the line with the path to the archive file with the original firmware
 
-`` `xml
+```xml
 <CMD state = "Updater" type = "push" body = "pipe tar -zxv -C / mnt / mtd3" file = "files / lumi_stock.tar.gz" ifdev = "MX6UL MX7D MX6ULL"> Sending and writing rootfs < / Cmd>
-``
+```
 
 Then again put the gateway into the boot mode via usb and via mfgtools
 flash the original firmware.
