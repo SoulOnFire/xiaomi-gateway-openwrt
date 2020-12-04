@@ -1,11 +1,11 @@
-# Установка Zesp32 на прошивку с openwrt
+# Installing Zesp32 on firmware with openwrt
 
-Zesp будет работать так же как и на стоковой прошивке, но ввиду отличия в системных
-библиотеках, требуются дополнительные шаги
+Zesp will work the same as on the stock firmware, but due to the difference in system
+libraries, additional steps are required
 
-### 1. Установка nodejs и zesp32
+### 1. Installing nodejs and zesp32
 
-Установите пакеты на шлюз
+Install packages on the gateway
 
 ```shell script
 wget https://github.com/devbis/xiaomi-gateway-openwrt/raw/master/files/node_v10.22.0-1_arm_cortex-a9_neon.ipk
@@ -16,27 +16,27 @@ opkg install node-npm_v10.22.0-1_arm_cortex-a9_neon.ipk
 opkg install node-zesp32_20200928-1_arm_cortex-a9_neon.ipk
 ```
 
-### 2. Zigbee прошивка.
+### 2. Zigbee firmware.
 
-Если у вас уже прошита версия для zesp, можно пропустить этот шаг.
+If you already have a zesp version, you can skip this step.
 
-Остановите zesp32
+Stop zesp32
 
 ```shell script
 killall node
 ```
 
-Чтобы прошить на openwrt введите команду
+To flash on openwrt enter the command
 
 ```shell script
 sh /root/flash.sh /opt/zesp32/util/Zigbee.bin --erasepdm
 ```
 
-Это обновит прошивку в модуле jn5169
-Теперь можно запустить zesp32 заново
+This will update the firmware in the jn5169 module
+Now you can start zesp32 again
 
 ```shell script
 /etc/init.d/zesp32 restart
 ```
 
-Интерфейс zesp32 будет доступен на `http://*GATEWAY_IP*:8081/`
+Zesp32 interface will be available at `http://*GATEWAY_IP*:8081/`
