@@ -1,37 +1,35 @@
-# Прошивка Zigate и подключение Zigate plugin к Domoticz
+# Zigate firmware and connecting Zigate plugin to Domoticz
 
-Для модуля jn5169, установленного на нашем шлюзе используется прошивка ZiGate.
-Она уже включена в архив. Чтобы прошить её в модуль, воспользуетесь командой
+For the jn5169 module installed on our gateway, the ZiGate firmware is used.
+It is already included in the archive. To flash it into the module, use the command
 
 ```shell script
 sh /root/flash.sh /root/zigate.bin --erasepdm
 ```
 
-Если вы уже прошивали модуль ранее прошивкой Zigate или от Zesp, данный шаг 
-можно пропустить. Zesp и Zigate совместимы по чати работы с плагином zigate.
+If you have previously flashed the module with Zigate or Zesp firmware, this step can be skipped. Zesp and Zigate are compatible with the zigate plugin.
 
-## Настройка плагина
+## Plugin setup
 
-Всё что нужно, это в разделе Setup > Hardware добавить элемент с типом
-`Zigate plugin`, вписать имя в поле Name и нажать `Add`
+All you need to do is add an element with the type
+`Zigate plugin`, enter a name in the Name field and click `Add`
 
-![Добавление Zigate plugin](images/zigate_plugin.png)
+![Adding Zigate plugin](images/zigate_plugin.png)
 
-спустя несколько минут плагин проинициализируется и запустит панель управления
-на порту 9440.
+after a few minutes the plugin will be initialized and launch the control panel on port 9440.
 
 
-## Панель управления Zigate
+## Zigate Control Panel
 
-![Панель управления](images/zigate_dashboard.png)
+![Control Panel](images/zigate_dashboard.png)
 
-В данной панели вы можете включить режим сопряжения с дочерними устройствами и 
-изменять настройки. 
-Чтобы включить режим добавления устройств, включите переключатель 
-`Accept new hardware` в верхнем правом углу.
+In this panel you can enable pairing mode with child devices and
+change settings.
+To enable add device mode, turn on the switch
+`Accept new hardware` in the upper right corner.
 
 
-Более подробно о панели вы можете прочитать на странице плагина
+You can read more about the panel on the plugin page
 [https://github.com/pipiche38/Domoticz-Zigate-Wiki/blob/master/en-eng/WebUserInterfaceNavigation.md](https://github.com/pipiche38/Domoticz-Zigate-Wiki/blob/master/en-eng/WebUserInterfaceNavigation.md)
 
-После добавления дочернего zigbee устройства оно появится в интерфейсе domoticz.
+After adding a child zigbee device, it will appear in the domoticz interface.
